@@ -333,7 +333,7 @@ body.ready .chip-float{opacity:1;transform:none}
 .cal-top{display:flex;justify-content:space-between;gap:16px;padding:15px clamp(16px,2vw,24px);border-bottom:1px solid var(--hairline);font-size:10.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .cal-top span:first-child{display:flex;align-items:center;gap:10px;color:var(--ink)}
 .cal-top i{width:22px;height:1px;background:var(--accent);flex:none}
-.cal-body{position:relative;padding:6px;min-height:640px;background:#fff}
+.cal-body{position:relative;padding:6px;min-height:640px;background:#fff;border-radius:4px}
 .cal-body iframe{display:block;width:100%;min-height:640px;border:0;position:relative;z-index:1}
 .cal-skel{position:absolute;inset:6px;display:grid;place-items:center;font-size:13.5px;color:var(--muted);background:#fff;z-index:0}
 .cal-skel::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(10,29,58,.035) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 1.6s linear infinite}
@@ -349,11 +349,12 @@ body.ready .chip-float{opacity:1;transform:none}
 .meet li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
 .plate-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;padding:20px var(--gut);border-top:1px solid var(--hairline);font-size:12.5px;color:var(--muted)}
 .plate-foot .legal{flex-basis:100%;font-size:11px;line-height:1.55;color:var(--faint);max-width:none}
-#calStage:not(.open) iframe{visibility:hidden!important;pointer-events:none!important}
-#calStage .bk-head{margin-bottom:20px}
-#calStage .bk-head h1{font-size:clamp(34px,4.2vw,58px);margin-bottom:12px}
-#calStage .bk-head h1 .it{display:inline}
 .bk-head h1 .it{display:block}
+.cal-page{padding-top:clamp(18px,2.4vw,30px)}
+.cal-page .bk-head{margin-bottom:clamp(16px,1.8vw,22px)}
+.cal-page .bk-head h1{font-size:clamp(32px,3.8vw,52px);margin-bottom:10px}
+.cal-page .bk-head h1 .it{display:inline}
+.cal-page .bk-head .lede{font-size:clamp(15px,1.1vw,17px)}
 
 /* ================= confirmation ================= */
 .ok-strip{display:inline-flex;align-items:center;gap:12px;padding:9px 18px 9px 10px;background:#fff;border:1px solid var(--hairline);border-radius:3px;box-shadow:0 20px 44px -26px rgba(10,29,58,.4);font-size:14px;color:var(--ink);font-weight:500;margin-bottom:26px;text-align:left}
