@@ -43,7 +43,7 @@
       time.textContent = fmt(t) + ' / ' + fmt(d);
       scrub.setAttribute('aria-valuenow', Math.round(t)); scrub.setAttribute('aria-valuemax', Math.round(d));
     }
-    function play(){ var p = main.play(); if (p && p.catch) p.catch(function(){}); }
+    function play(retry){ var p = main.play(); if (p && p.catch) p.catch(function(){ if (!retry) setTimeout(function(){ if (main.paused && box.classList.contains('started') && !main.ended) play(true); }, 250); }); }
     function begin(){
       box.classList.add('started');
       if (prev) { try { prev.pause(); } catch (e) {} prev.style.visibility = 'hidden'; }
@@ -92,6 +92,17 @@
   }
 
 
+  /* ---------------- click-to-play YouTube posters (no outbound links) ---------------- */
+  [].slice.call(document.querySelectorAll('[data-yt]')).forEach(function(b){
+    b.addEventListener('click', function(){
+      if (b.querySelector('iframe')) return;
+      var f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + b.getAttribute('data-yt') + '?autoplay=1&rel=0&modestbranding=1';
+      f.title = b.getAttribute('aria-label') || 'Video'; f.allow = 'autoplay; encrypted-media; picture-in-picture'; f.setAttribute('allowfullscreen', '');
+      b.appendChild(f); b.classList.add('on');
+    });
+  });
+
   /* ---------------- faq: one open at a time, real height ---------------- */
   [].slice.call(document.querySelectorAll('.faq-i')).forEach(function(item){
     var q = item.querySelector('.faq-q'), a = item.querySelector('.faq-a');
@@ -106,7 +117,8 @@
   /* ---------------- phones: one button in reach after the hero button leaves the screen ---------------- */
   var dock = document.getElementById('dock');
   if (dock && 'IntersectionObserver' in window) {
-    var blockers = [document.getElementById('heroAct'), document.getElementById('close')].filter(Boolean), shown = {};
+    var blockers = [].slice.call(document.querySelectorAll('#heroAct, #close, .act, .ask-act, .split-act')), shown = {};
+    blockers.forEach(function(b, i){ if (!b.id) b.id = 'blk' + i; });
     var past = false;
     function syncDock(){ var blocked = blockers.some(function(b){ return shown[b.id]; }); dock.classList.toggle('on', past && !blocked); }
     var dio = new IntersectionObserver(function(en){ en.forEach(function(x){ shown[x.target.id] = x.isIntersecting; }); syncDock(); }, { threshold: 0 });
