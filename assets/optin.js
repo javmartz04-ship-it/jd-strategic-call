@@ -91,6 +91,18 @@
     [].slice.call(document.querySelectorAll('a.btn')).forEach(function(a){ a.addEventListener('click', function(){ if (!main.paused) main.pause(); }); });
   }
 
+
+  /* ---------------- faq: one open at a time, real height ---------------- */
+  [].slice.call(document.querySelectorAll('.faq-i')).forEach(function(item){
+    var q = item.querySelector('.faq-q'), a = item.querySelector('.faq-a');
+    q.addEventListener('click', function(){
+      var open = item.classList.contains('open');
+      [].slice.call(document.querySelectorAll('.faq-i.open')).forEach(function(o){ if (o !== item) { o.classList.remove('open'); o.querySelector('.faq-q').setAttribute('aria-expanded', 'false'); o.querySelector('.faq-a').style.height = '0px'; } });
+      item.classList.toggle('open', !open); q.setAttribute('aria-expanded', open ? 'false' : 'true');
+      a.style.height = open ? '0px' : a.scrollHeight + 'px';
+    });
+  });
+
   /* ---------------- phones: one button in reach after the hero button leaves the screen ---------------- */
   var dock = document.getElementById('dock');
   if (dock && 'IntersectionObserver' in window) {
