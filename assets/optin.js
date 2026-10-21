@@ -88,7 +88,6 @@
     var tt = null;
     box.addEventListener('touchstart', function(){ box.classList.add('touch'); clearTimeout(tt); tt = setTimeout(function(){ box.classList.remove('touch'); }, 3000); }, { passive: true });
     /* leaving for the calendar pauses the video */
-    [].slice.call(document.querySelectorAll('a.btn')).forEach(function(a){ a.addEventListener('click', function(){ if (!main.paused) main.pause(); }); });
   }
 
 
@@ -113,6 +112,68 @@
       a.style.height = open ? '0px' : a.scrollHeight + 'px';
     });
   });
+
+
+  /* ---------------- step 1 of 2: every button opens the opt-in form; submit goes to the calendar ----------------
+     WEBHOOK: Josh's GHL inbound webhook for this funnel's opt-ins. Empty = preview mode: the form validates,
+     stores the lead in this browser and moves on to the calendar, and nothing is sent anywhere.
+     The calendar is prefilled from the lead (GHL reads first_name, last_name, email, phone from its URL). */
+  var WEBHOOK = '';
+  var LEAD_KEY = 'jds_lead';
+  var dlg = document.getElementById('optin'), form = document.getElementById('optForm');
+  if (dlg && form && typeof dlg.showModal === 'function') {
+    var vMain = document.getElementById('vMain');
+    function openForm(){
+      if (vMain && !vMain.paused) vMain.pause();
+      if (!dlg.open) dlg.showModal();
+      setTimeout(function(){ var f = document.getElementById('f-name'); if (f) f.focus(); }, 60);
+    }
+    document.addEventListener('click', function(e){
+      var a = e.target.closest('a[href="book.html"]'); if (!a || a.closest('#optin')) return;
+      e.preventDefault(); openForm();
+    });
+    document.getElementById('optClose').addEventListener('click', function(){ dlg.close(); });
+    dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.close(); });
+    if (/[?&]optin=1/.test(location.search)) openForm();
+
+    var checks = {
+      name: function(v){ return v.trim().split(/\s+/).length >= 2 && v.trim().length >= 3; },
+      email: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); },
+      phone: function(v){ return v.replace(/\D/g, '').length >= 10; }
+    };
+    [].slice.call(form.querySelectorAll('input')).forEach(function(i){ i.addEventListener('input', function(){ i.closest('.field').classList.remove('bad'); }); });
+    var btn = document.getElementById('optSubmit'), LABEL = btn.textContent;
+    window.addEventListener('pageshow', function(){ btn.disabled = false; btn.textContent = LABEL; });
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var first = null;
+      Object.keys(checks).forEach(function(k){
+        var el = form.elements[k], good = checks[k](el.value);
+        el.closest('.field').classList.toggle('bad', !good); el.setAttribute('aria-invalid', String(!good));
+        if (!good && !first) first = el;
+      });
+      if (first) { first.focus(); return; }
+      var full = form.elements.name.value.trim().replace(/\s+/g, ' '), parts = full.split(' ');
+      var qs = new URLSearchParams(location.search);
+      var data = { first_name: parts[0], last_name: parts.slice(1).join(' '), full_name: full,
+        email: form.elements.email.value.trim(), phone: form.elements.phone.value.trim(),
+        source: 'JD Strategic Call Funnel', page_url: location.origin + location.pathname, submitted_at: new Date().toISOString() };
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid'].forEach(function(k){ if (qs.get(k)) data[k] = qs.get(k).slice(0, 200); });
+      data.summary = 'Franchise Fit Review opt-in: ' + full + ' | ' + data.phone + ' | ' + data.email + (data.utm_campaign ? ' | campaign: ' + data.utm_campaign : '');
+      try { localStorage.setItem(LEAD_KEY, JSON.stringify({ first_name: data.first_name, last_name: data.last_name, email: data.email, phone: data.phone, t: Date.now() })); } catch (err) {}
+      btn.disabled = true; btn.textContent = 'One moment...';
+      var gone = false;
+      function go(){ if (gone) return; gone = true; location.href = 'book.html'; }
+      if (!WEBHOOK) { go(); return; }
+      /* guaranteed redirect: JSON first; on any failure a keepalive backup; a 6 second guard no matter what */
+      var guard = setTimeout(go, 6000);
+      var body = JSON.stringify(data);
+      fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+        .then(function(r){ return r.text().then(function(t){ if (!(r.ok && /success/i.test(t) && !/error/i.test(t))) throw new Error('rejected'); }); })
+        .catch(function(){ try { fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', keepalive: true, body: body }); } catch (err) {} })
+        .then(function(){ clearTimeout(guard); go(); });
+    });
+  }
 
   /* ---------------- phones: one button in reach after the hero button leaves the screen ---------------- */
   var dock = document.getElementById('dock');

@@ -66,10 +66,16 @@
 
   /* ================= book: the calendar, straight away ================= */
   if (PAGE === 'book') {
+    /* step 2 of 2: only reachable after the opt-in form. No lead = back to page 1 with the form open. */
+    var lead = null;
+    try { lead = JSON.parse(localStorage.getItem('jds_lead') || 'null'); } catch (e) {}
+    if (!lead || !lead.email) { location.replace('index.html?optin=1'); return; }
     var body = document.getElementById('calBody'), skel = document.getElementById('calSkel');
     if (body) {
       var f = document.createElement('iframe');
-      f.src = CALENDAR + '?source=' + encodeURIComponent('JD Strategic Call Funnel');
+      var q = ['first_name', 'last_name', 'email', 'phone'].filter(function(k){ return lead[k]; }).map(function(k){ return k + '=' + encodeURIComponent(lead[k]); });
+      q.push('source=' + encodeURIComponent('JD Strategic Call Funnel'));
+      f.src = CALENDAR + '?' + q.join('&');
       f.title = 'Book a call with Josh DuBois'; f.id = 'P9QsS5fdmp3TZWbOhvYY_book'; f.setAttribute('scrolling', 'no');
       f.addEventListener('load', function(){ setTimeout(function(){ if (skel) skel.remove(); }, 400); });
       body.appendChild(f);

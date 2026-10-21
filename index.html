@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:opsz,wght@14..32,400..700&family=Montserrat:wght@400;800&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/vsl/poster.jpg">
-<link rel="stylesheet" href="assets/optin.css?v=54e291ee04">
+<link rel="stylesheet" href="assets/optin.css?v=915c650b25">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -227,8 +227,24 @@
   <p class="copy">&copy; 2026 JD Strategic Franchising. All rights reserved.</p>
 </footer>
 
+<dialog id="optin" aria-labelledby="optin-title">
+  <div class="sheet">
+    <button class="x" type="button" id="optClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <p class="step">Step 1 of 2</p>
+    <h2 id="optin-title">Where should Josh reach you?</h2>
+    <p class="sheet-sub">Next, you&rsquo;ll pick a time for your free 20-minute Franchise Fit Review.</p>
+    <form id="optForm" novalidate>
+      <div class="field"><label for="f-name">Your Full Name</label><input id="f-name" name="name" autocomplete="name" required><p class="err">Please type your full name.</p></div>
+      <div class="field"><label for="f-email">Email Address</label><input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" required><p class="err">Please check your email address.</p></div>
+      <div class="field"><label for="f-phone">Phone Number</label><input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required><p class="err">Please type a phone number with 10 digits.</p></div>
+      <button class="btn" type="submit" id="optSubmit">Next: Pick Your Time</button>
+      <p class="risk">Your details go only to Josh. No spam, ever.</p>
+    </form>
+  </div>
+</dialog>
+
 <div class="dock" id="dock"><a class="btn" href="book.html">Get My Free Franchise Fit Review</a></div>
 
-<script src="assets/optin.js?v=f2752ce587"></script>
+<script src="assets/optin.js?v=b2b912a198"></script>
 </body>
 </html>
